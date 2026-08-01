@@ -34,8 +34,12 @@ except Exception:
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db.init_app(app)
 limiter.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 # Initialize mailer
 from mailer import init_app as init_mailer, send_email
@@ -1009,6 +1013,4 @@ def test_email(recipient):
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=os.environ.get("FLASK_DEBUG", "0") == "1", port=5000)

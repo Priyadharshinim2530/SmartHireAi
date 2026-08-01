@@ -1,0 +1,9 @@
+Hello {{ name }},
+
+Congratulations! You have been shortlisted/selected for the role "{{ job_title }}" at {{ company_name }}.
+
+We will contact you with next steps.
+
+Best,
+SmartHireAI Team
+

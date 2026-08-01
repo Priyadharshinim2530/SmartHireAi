@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ company.company_name }} — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <a href="javascript:history.back()" class="back-link" style="display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:14px; font-weight:500; margin-bottom:24px; transition:color .15s ease;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Back
+  </a>
+
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom: 24px;">
+        <h1 style="color:var(--ink); font-size:36px; margin-bottom: 8px;">{{ company.company_name }}</h1>
+        
+        {% if company.industry %}
+          <span class="chip" style="background:var(--warn-bg); border-color:#f0e0bb; color:var(--amber-deep); font-weight:600; margin-bottom: 16px; display:inline-block;">
+            {{ company.industry }}
+          </span>
+        {% endif %}
+
+        {% if company.website %}
+          <div style="margin-bottom: 20px;">
+            <a href="{{ company.website }}" target="_blank" rel="noopener noreferrer" style="color:var(--ink); font-weight:600; text-decoration:underline; font-size:14.5px; display:inline-flex; align-items:center; gap:4px;">
+              Visit Website ↗
+            </a>
+          </div>
+        {% endif %}
+
+        <h3 style="color:var(--ink); font-size:18px; margin-top:24px; margin-bottom:12px;">About the company</h3>
+        <p style="white-space: pre-line; line-height: 1.6; color: var(--graphite);">
+          {{ company.description or "No description provided yet." }}
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="font-size:22px; color:var(--ink); margin-bottom:16px;">Active Openings</h2>
+      <div class="job-list">
+        {% for job in jobs %}
+        <div class="job-card">
+          <div class="job-main">
+            <h3>{{ job.title }}</h3>
+            <div class="job-meta">
+              <span>{{ job.location or 'Remote' }}</span>
+              <span>· {{ job.job_type }}</span>
+              <span>· {{ job.min_experience }}+ yrs</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            {% if job.id in applied_job_ids %}
+              <span class="badge badge-applied">Applied</span>
+            {% else %}
+              <form method="POST" action="{{ url_for('seeker_apply', job_id=job.id) }}">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-amber btn-small">Apply now</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div class="card empty-state" style="padding:40px;">
+          <span class="empty-icon">💼</span>
+          No open roles at this company right now.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

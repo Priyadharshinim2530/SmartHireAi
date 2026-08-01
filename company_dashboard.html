@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1><a href="{{ url_for('company_profile') }}" style="color: inherit; text-decoration: none;">{{ company.company_name }}</a></h1>
+      <div class="sub">Here's how hiring is going.</div>
+    </div>
+    <a href="{{ url_for('company_new_job') }}" class="btn btn-amber">+ Post a job</a>
+  </div>
+
+  <div class="grid-3">
+    <div class="card stat-card">
+      <div class="stat-label">Open roles</div>
+      <div class="stat-value">{{ open_jobs_count }}</div>
+      <div class="stat-note">out of {{ total_jobs }} total posted</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Total applicants</div>
+      <div class="stat-value">{{ total_applicants }}</div>
+      <div class="stat-note">across all roles</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Analytics</div>
+      <div class="stat-value" style="font-size:22px;"><a href="{{ url_for('company_analytics') }}" style="color:var(--ink);">View dashboard →</a></div>
+      <div class="stat-note">Score distribution, trends, funnel</div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <h2>Recent job posts</h2>
+    <a href="{{ url_for('company_jobs') }}">Manage all</a>
+  </div>
+
+  {% if jobs %}
+  <div class="job-list">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="job-main">
+        <h3>{{ job.title }}</h3>
+        <div class="job-meta">
+          <span class="badge badge-{{ job.status }}">{{ job.status }}</span>
+          <span>· {{ job.location or 'Remote' }}</span>
+          <span>· Posted {{ job.created_at.strftime('%b %d, %Y') }}</span>
+        </div>
+      </div>
+      <a href="{{ url_for('company_applicants', job_id=job.id) }}" class="btn btn-ghost btn-small">View applicants</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <span class="empty-icon">🗂️</span>
+    You haven't posted any jobs yet. <a href="{{ url_for('company_new_job') }}" style="color:var(--ink); font-weight:600;">Post your first role →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

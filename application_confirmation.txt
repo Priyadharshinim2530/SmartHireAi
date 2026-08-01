@@ -1,0 +1,12 @@
+Hello {{ name }},
+
+Thanks for applying to "{{ job_title }}" at {{ company_name }}.
+
+Application ID: {{ application_id }}
+Applied on: {{ applied_at }}
+
+We'll notify you about the next steps.
+
+Good luck,
+SmartHireAI Team
+

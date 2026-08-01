@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Browse jobs — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Open roles</h1>
+      <div class="sub">{{ jobs|length }} role{{ 's' if jobs|length != 1 else '' }} matching your search</div>
+    </div>
+    <form method="GET" action="{{ url_for('seeker_jobs') }}" style="display:flex; gap:8px;">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by title or skill…" style="min-width:260px;">
+      <button type="submit" class="btn btn-outline btn-small">Search</button>
+    </form>
+  </div>
+
+  <div class="job-list">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="job-main">
+        <h3>{{ job.title }}</h3>
+        <div class="job-meta">
+          <span><a href="{{ url_for('company_profile_view', company_id=job.company.id) }}" class="company-link">{{ job.company.company_name }}</a></span>
+          <span>· {{ job.location or 'Remote' }}</span>
+          <span>· {{ job.job_type }}</span>
+          <span>· {{ job.min_experience }}+ yrs</span>
+        </div>
+        <p style="margin-top:10px; color:var(--muted); font-size:14px;">{{ job.description[:180] }}{% if job.description|length > 180 %}…{% endif %}</p>
+        {% if job.required_skills %}
+        <div class="job-skills">
+          {% for skill in job.required_skills.split(',')[:8] %}
+            <span class="chip">{{ skill.strip() }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="job-actions">
+        {% if job.id in applied_job_ids %}
+          <span class="badge badge-applied">Applied</span>
+        {% else %}
+          <form method="POST" action="{{ url_for('seeker_apply', job_id=job.id) }}">
+            {{ csrf_field() }}
+            <button type="submit" class="btn btn-amber btn-small">Apply now</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="card empty-state">
+      <span class="empty-icon">🔍</span>
+      No roles match "{{ q }}" right now.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

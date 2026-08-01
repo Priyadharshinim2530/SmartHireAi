@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Send Interview Invitation</h2>
+  <form method="post">
+    {{ csrf_field() }}
+    <label>Date (YYYY-MM-DD):<br/><input type="text" name="date" required></label><br/>
+    <label>Time (HH:MM):<br/><input type="text" name="time" required></label><br/>
+    <label>Meeting link:<br/><input type="url" name="meeting_link" required></label><br/>
+    <label>Message (optional):<br/><textarea name="message" rows="4"></textarea></label><br/>
+    <button type="submit">Send Invite</button>
+  </form>
+{% endblock %}

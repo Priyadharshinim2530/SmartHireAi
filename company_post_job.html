@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit job' if job else 'Post a job' }} — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>{{ 'Edit job' if job else 'Post a new job' }}</h1>
+      <div class="sub">Be specific with required skills — that's what drives ATS match scoring for applicants.</div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('company_edit_job', job_id=job.id) if job else url_for('company_new_job') }}">
+    {{ csrf_field() }}
+    <div class="card form-wide">
+      <label for="title">Job title</label>
+      <input type="text" id="title" name="title" required value="{{ job.title if job else '' }}" placeholder="e.g. Senior Backend Engineer">
+
+      <label for="description">Job description</label>
+      <textarea id="description" name="description" required rows="6" placeholder="Responsibilities, what the team does, what success looks like…">{{ job.description if job else '' }}</textarea>
+
+      <label for="required_skills">Required skills (comma-separated)</label>
+      <textarea id="required_skills" name="required_skills" placeholder="Python, Django, PostgreSQL, REST APIs, AWS">{{ job.required_skills if job else '' }}</textarea>
+      <div class="hint">Each skill listed here is checked against every applicant's resume to compute their match score.</div>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="{{ job.location if job else '' }}" placeholder="Remote, Chennai, Bangalore…">
+
+      <label for="job_type">Job type</label>
+      <select id="job_type" name="job_type">
+        {% for t in ['Full-time', 'Part-time', 'Contract', 'Internship'] %}
+          <option value="{{ t }}" {% if job and job.job_type == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="min_experience">Minimum years of experience</label>
+      <input type="number" step="0.5" min="0" id="min_experience" name="min_experience" value="{{ job.min_experience if job else 0 }}">
+
+      <button type="submit" class="btn btn-amber" style="margin-top:22px;">{{ 'Save changes' if job else 'Post job' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

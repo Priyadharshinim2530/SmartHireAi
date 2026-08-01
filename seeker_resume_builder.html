@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Build your resume — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Build your ATS-friendly resume</h1>
+      <div class="sub">Structured fields in, clean plain-text resume out — exactly what applicant tracking systems parse best.</div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('seeker_resume') }}">
+    {{ csrf_field() }}
+    <div class="card form-wide" style="margin-bottom:20px;">
+      <h3 style="color:var(--ink);">Basics</h3>
+      <label for="full_name">Full name</label>
+      <input type="text" id="full_name" name="full_name" required value="{{ seeker.full_name or '' }}">
+
+      <label for="headline">Headline</label>
+      <input type="text" id="headline" name="headline" placeholder="e.g. Frontend Engineer · React & TypeScript" value="{{ seeker.headline or '' }}">
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" value="{{ seeker.phone or '' }}">
+
+      <label for="experience_years">Years of experience</label>
+      <input type="number" step="0.5" min="0" id="experience_years" name="experience_years" value="{{ seeker.experience_years or 0 }}">
+    </div>
+
+    <div class="card form-wide" style="margin-bottom:20px;">
+      <h3 style="color:var(--ink);">Summary</h3>
+      <label for="summary">Professional summary</label>
+      <textarea id="summary" name="summary" placeholder="2–3 sentences on what you do and the impact you drive.">{{ seeker.summary or '' }}</textarea>
+    </div>
+
+    <div class="card form-wide" style="margin-bottom:20px;">
+      <h3 style="color:var(--ink);">Skills</h3>
+      <label for="skills">Skills (comma-separated)</label>
+      <textarea id="skills" name="skills" placeholder="Python, React, SQL, Project Management, Figma">{{ seeker.skills or '' }}</textarea>
+      <div class="hint">This is what gets matched most heavily against job requirements — be specific and use the same terms recruiters use.</div>
+    </div>
+
+    <div class="card form-wide" style="margin-bottom:20px;">
+      <h3 style="color:var(--ink);">Work history</h3>
+      <div id="work-history-rows">
+        {% for job in work_history %}
+        <div class="repeat-row">
+          <button type="button" class="remove-row">Remove</button>
+          <label>Job title</label>
+          <input type="text" name="job_title[]" value="{{ job.title }}">
+          <label>Company</label>
+          <input type="text" name="job_company[]" value="{{ job.company }}">
+          <label>Duration</label>
+          <input type="text" name="job_duration[]" value="{{ job.duration }}">
+          <label>Description</label>
+          <textarea name="job_description[]">{{ job.description }}</textarea>
+        </div>
+        {% endfor %}
+      </div>
+      <button type="button" id="add-work-row" class="btn btn-ghost btn-small" style="margin-top:14px;">+ Add role</button>
+    </div>
+
+    <div class="card form-wide" style="margin-bottom:20px;">
+      <h3 style="color:var(--ink);">Education</h3>
+      <label for="education">Education</label>
+      <textarea id="education" name="education" placeholder="B.Tech Computer Science, Anna University, 2022">{{ seeker.education or '' }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-amber">Save resume</button>
+  </form>
+
+  {% if seeker.resume_text %}
+  <div class="section-title"><h2>Preview: what recruiters and ATS engines see</h2></div>
+  <div class="card mono" style="white-space:pre-wrap; font-size:13.5px; line-height:1.7;">{{ seeker.resume_text }}</div>
+  {% endif %}
+</div>
+{% endblock %}

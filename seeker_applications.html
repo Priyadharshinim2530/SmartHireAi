@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}My applications — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>My applications</h1>
+      <div class="sub">{{ items|length }} application{{ 's' if items|length != 1 else '' }}</div>
+    </div>
+  </div>
+
+  {% if items %}
+  <div class="job-list">
+    {% for item in items %}
+    <div class="card" style="display:flex; gap:24px; align-items:center;">
+      <div class="match-gauge" data-score="{{ item.application.ats_score }}" data-size="120" data-caption="ATS match"></div>
+      <div style="flex:1;">
+        <h3 style="color:var(--ink); margin-bottom:4px;">{{ item.job.title }}</h3>
+        <div class="job-meta"><a href="{{ url_for('company_profile_view', company_id=item.job.company.id) }}" class="company-link">{{ item.job.company.company_name }}</a> · Applied {{ item.application.applied_at.strftime('%b %d, %Y') }}</div>
+        <div style="margin-top:10px;">
+          <span class="badge badge-{{ item.application.status }}">{{ item.application.status }}</span>
+        </div>
+        {% if item.breakdown.missing_skills %}
+        <div style="margin-top:12px;">
+          <div class="hint" style="margin-bottom:6px;">Skills this role wants that aren't on your resume yet:</div>
+          <div class="job-skills">
+            {% for skill in item.breakdown.missing_skills %}
+              <span class="chip miss">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <span class="empty-icon">📄</span>
+    No applications yet — <a href="{{ url_for('seeker_jobs') }}" style="color:var(--ink); font-weight:600;">browse open roles</a>.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

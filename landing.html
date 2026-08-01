@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}SmartHireAI — Hire smarter. Get seen faster.{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="eyebrow">
+      <span class="ping-dot"></span>
+      Live ATS scoring engine
+    </span>
+    <h1>Resumes that <span class="accent">actually</span> get read.<br>Jobs that actually fit.</h1>
+    <p class="hero-sub">SmartHireAI scores every application against the real requirements of a role — skills, keywords, experience — so job seekers know exactly where they stand, and recruiters see their top matches first.</p>
+    <div class="hero-ctas">
+      <a href="{{ url_for('signup') }}?role=seeker" class="btn btn-amber hero-btn">I'm looking for a job</a>
+      <a href="{{ url_for('signup') }}?role=company" class="btn btn-outline hero-btn">I'm hiring</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">{{ open_jobs_count | default(0) }}</span>
+        <span class="label">Open roles</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">{{ company_count | default(0) }}</span>
+        <span class="label">Companies hiring</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">{{ seeker_count | default(0) }}</span>
+        <span class="label">Candidates matched</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="gauge-card premium-card">
+    <div class="gauge-card-header">
+      <span class="gauge-title">Interactive ATS Demo</span>
+      <span class="pulse-indicator">
+        <span class="pulse-ring"></span>
+        <span class="pulse-dot"></span>
+        Active Score
+      </span>
+    </div>
+    <h2 class="gauge-job">Senior Frontend Engineer <span class="at-company">@ Lumen Labs</span></h2>
+    
+    <div class="match-gauge-wrapper">
+      <div class="match-gauge" data-score="82" data-size="190" data-caption="Overall ATS match" data-animate="true"></div>
+    </div>
+    
+    <div class="gauge-legend">
+      <div class="gauge-legend-row">
+        <div class="legend-info">
+          <span class="tag">Skill overlap</span>
+          <span class="val">41 / 50</span>
+        </div>
+        <div class="legend-bar-track">
+          <div class="legend-bar-fill skill-fill" style="width: 82%;"></div>
+        </div>
+      </div>
+      <div class="gauge-legend-row">
+        <div class="legend-info">
+          <span class="tag">Keyword match</span>
+          <span class="val">23 / 30</span>
+        </div>
+        <div class="legend-bar-track">
+          <div class="legend-bar-fill keyword-fill" style="width: 76%;"></div>
+        </div>
+      </div>
+      <div class="gauge-legend-row">
+        <div class="legend-info">
+          <span class="tag">Experience fit</span>
+          <span class="val">18 / 20</span>
+        </div>
+        <div class="legend-bar-track">
+          <div class="legend-bar-fill exp-fill" style="width: 90%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" style="padding-top:20px; padding-bottom: 80px;">
+  <div class="grid-3">
+    <div class="card benefit-card">
+      <div class="benefit-icon seeker-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+      </div>
+      <h3 style="color:var(--ink); margin-top: 12px; margin-bottom: 8px;">For job seekers</h3>
+      <p>Build a structured, ATS-friendly resume once. See your match score against every job before you apply — no more guessing why the algorithm skipped you.</p>
+    </div>
+    
+    <div class="card benefit-card">
+      <div class="benefit-icon recruiter-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+      <h3 style="color:var(--ink); margin-top: 12px; margin-bottom: 8px;">For recruiters</h3>
+      <p>Post a role, define what actually matters, and let scoring surface your top 10 candidates automatically — ranked, explainable, and ready to review.</p>
+    </div>
+    
+    <div class="card benefit-card">
+      <div class="benefit-icon transparent-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="14"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </div>
+      <h3 style="color:var(--ink); margin-top: 12px; margin-bottom: 8px;">Transparent scoring</h3>
+      <p>Every score breaks down into skill overlap, keyword match, and experience fit — visible to both sides, so nobody's guessing at a black box.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

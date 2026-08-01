@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Analytics — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;gap:20px;">
+    <div>
+      <h1>Analytics</h1>
+      <div class="sub">How {{ company.company_name }}'s hiring pipeline is trending</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button id="exportPdf" class="btn">Export PDF</button>
+      <a id="exportXlsx" class="btn btn-secondary" href="{{ url_for('company_analytics_export') }}?format=xlsx">Export Excel</a>
+      <a id="exportCsv" class="btn" href="{{ url_for('company_analytics_export') }}?format=csv">Export CSV</a>
+    </div>
+  </div>
+
+  <div class="grid-4" style="gap:12px; margin-top:16px;">
+    <div class="card">
+      <div class="muted">Total jobs</div>
+      <div class="h2" id="totalJobs">—</div>
+    </div>
+    <div class="card">
+      <div class="muted">Total applications</div>
+      <div class="h2" id="totalApplications">—</div>
+    </div>
+    <div class="card">
+      <div class="muted">Shortlisted</div>
+      <div class="h2" id="shortlistedCount">—</div>
+    </div>
+    <div class="card">
+      <div class="muted">Rejected</div>
+      <div class="h2" id="rejectedCount">—</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card chart-card">
+      <h3>Applications per job</h3>
+      <div class="chart-canvas-wrap"><canvas id="chartPerJob"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Pipeline status</h3>
+      <div class="chart-canvas-wrap"><canvas id="chartStatus"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card chart-card">
+      <h3>Applications over time (monthly)</h3>
+      <div class="chart-canvas-wrap"><canvas id="chartMonthlyTrend"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <h3>ATS score distribution</h3>
+      <div class="chart-canvas-wrap"><canvas id="chartScores"></canvas></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<!-- html2canvas + jsPDF used for client-side PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const PALETTE = { ink: '#0B3D2E', amber: '#E8A33D', line: '#DEDACD', success: '#2F6B45', danger: '#B3462C', graphite: '#20241E' };
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = PALETTE.graphite;
+
+fetch("{{ url_for('api_company_analytics') }}").then(r => r.json()).then(data => {
+  new Chart(document.getElementById('chartPerJob'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(data.applications_per_job),
+      datasets: [{ label: 'Applicants', data: Object.values(data.applications_per_job), backgroundColor: PALETTE.ink, borderRadius: 6 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+
+  new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Applied', 'Shortlisted', 'Rejected'],
+      datasets: [{ data: [data.status_counts.applied, data.status_counts.shortlisted, data.status_counts.rejected],
+        backgroundColor: [PALETTE.amber, PALETTE.success, PALETTE.danger] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  new Chart(document.getElementById('chartMonthlyTrend'), {
+    type: 'line',
+    data: {
+      labels: Object.keys(data.monthly_trend || {}),
+      datasets: [{ label: 'Applications', data: Object.values(data.monthly_trend || {}), borderColor: PALETTE.ink, backgroundColor: 'rgba(11,61,46,0.08)', fill: true, tension: 0.3 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+
+  new Chart(document.getElementById('chartScores'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(data.score_buckets),
+      datasets: [{ label: 'Applicants', data: Object.values(data.score_buckets), backgroundColor: PALETTE.amber, borderRadius: 6 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+});
+
+// PDF export: capture the page area and create a PDF
+const exportBtn = document.getElementById('exportPdf');
+if(exportBtn){
+  exportBtn.addEventListener('click', async function(){
+    const { jsPDF } = window.jspdf;
+    const page = document.querySelector('.page');
+    const canvas = await html2canvas(page, { scale: 2 });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('{{ company.company_name|replace(" ", "_") }}-analytics.pdf');
+  });
+}
+
+</script>
+{% endblock %}

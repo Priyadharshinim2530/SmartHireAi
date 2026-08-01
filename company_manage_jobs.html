@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Manage jobs — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Manage jobs</h1>
+      <div class="sub">{{ jobs|length }} job{{ 's' if jobs|length != 1 else '' }} posted</div>
+    </div>
+    <a href="{{ url_for('company_new_job') }}" class="btn btn-amber">+ Post a job</a>
+  </div>
+
+  {% if jobs %}
+  <div class="card" style="padding:0;">
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Status</th><th>Applicants</th><th>Posted</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td><strong>{{ job.title }}</strong><div class="hint">{{ job.location or 'Remote' }}</div></td>
+          <td><span class="badge badge-{{ job.status }}">{{ job.status }}</span></td>
+          <td class="mono">{{ counts[job.id] }}</td>
+          <td>{{ job.created_at.strftime('%b %d, %Y') }}</td>
+          <td>
+            <div style="display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap;">
+              <a href="{{ url_for('company_applicants', job_id=job.id) }}" class="btn btn-ghost btn-small">Applicants</a>
+              <a href="{{ url_for('company_edit_job', job_id=job.id) }}" class="btn btn-ghost btn-small">Edit</a>
+              <form method="POST" action="{{ url_for('company_toggle_job', job_id=job.id) }}">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-ghost btn-small">{{ 'Close' if job.status == 'open' else 'Reopen' }}</button>
+              </form>
+              <form method="POST" action="{{ url_for('company_delete_job', job_id=job.id) }}" onsubmit="return confirm('Delete this job and all its applications?');">
+                {{ csrf_field() }}
+                <button type="submit" class="btn btn-danger btn-small">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <span class="empty-icon">🗂️</span>
+    No jobs yet. <a href="{{ url_for('company_new_job') }}" style="color:var(--ink); font-weight:600;">Post your first role →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

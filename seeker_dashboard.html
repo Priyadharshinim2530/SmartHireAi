@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Welcome back, {{ seeker.full_name.split(' ')[0] if seeker.full_name else 'there' }}</h1>
+      <div class="sub">Here's where things stand.</div>
+    </div>
+    {% if not resume_complete %}
+      <a href="{{ url_for('seeker_resume') }}" class="btn btn-amber">Finish your resume</a>
+    {% else %}
+      <a href="{{ url_for('seeker_jobs') }}" class="btn btn-amber">Browse jobs</a>
+    {% endif %}
+  </div>
+
+  {% if not resume_complete %}
+  <div class="card" style="background:var(--warn-bg); border-color:#f0e0bb; margin-bottom:28px;">
+    <strong style="color:var(--amber-deep);">Your resume isn't complete yet.</strong>
+    <p style="margin-top:6px; margin-bottom:0;">Add your skills, summary, and education so we can calculate accurate ATS match scores when you apply.</p>
+  </div>
+  {% endif %}
+
+  <div class="grid-3">
+    <div class="card stat-card">
+      <div class="stat-label">Total applications</div>
+      <div class="stat-value">{{ total_applications }}</div>
+      <div class="stat-note">Across all roles you've applied to</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Resume status</div>
+      <div class="stat-value" style="font-size:22px; color: 'var(--success)' if resume_complete else 'var(--amber-deep)' ;">
+        {{ 'Complete' if resume_complete else 'In progress' }}
+      </div>
+      <div class="stat-note"><a href="{{ url_for('seeker_resume') }}" style="color:var(--ink); font-weight:600;">Edit resume →</a></div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Open roles right now</div>
+      <div class="stat-value">{{ open_jobs|length }}</div>
+      <div class="stat-note"><a href="{{ url_for('seeker_jobs') }}" style="color:var(--ink); font-weight:600;">See all →</a></div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <h2>Recent applications</h2>
+    <a href="{{ url_for('seeker_applications') }}">View all</a>
+  </div>
+  {% if applications %}
+  <div class="card" style="padding:0;">
+    <table>
+      <thead><tr><th>Job</th><th>ATS Score</th><th>Status</th><th>Applied</th></tr></thead>
+      <tbody>
+        {% for a in applications %}
+        <tr>
+          <td>{{ a.job.title }}</td>
+          <td class="mono">{{ a.ats_score }}/100</td>
+          <td><span class="badge badge-{{ a.status }}">{{ a.status }}</span></td>
+          <td>{{ a.applied_at.strftime('%b %d, %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <span class="empty-icon">📄</span>
+    You haven't applied to anything yet — <a href="{{ url_for('seeker_jobs') }}" style="color:var(--ink); font-weight:600;">browse open roles</a>.
+  </div>
+  {% endif %}
+
+  <div class="section-title">
+    <h2>Open roles</h2>
+    <a href="{{ url_for('seeker_jobs') }}">Browse all</a>
+  </div>
+  <div class="job-list">
+    {% for job in open_jobs %}
+    <div class="job-card">
+      <div class="job-main">
+        <h3>{{ job.title }}</h3>
+        <div class="job-meta">
+          <span><a href="{{ url_for('company_profile_view', company_id=job.company.id) }}" class="company-link">{{ job.company.company_name }}</a></span>
+          <span>· {{ job.location or 'Remote' }}</span>
+          <span>· {{ job.job_type }}</span>
+        </div>
+      </div>
+      <a href="{{ url_for('seeker_jobs') }}" class="btn btn-ghost btn-small">View</a>
+    </div>
+    {% else %}
+    <div class="card empty-state">No open roles right now — check back soon.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Applicants — {{ job.title }}{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>{{ job.title }}</h1>
+      <div class="sub">{{ items|length }} applicant{{ 's' if items|length != 1 else '' }} shown, ranked by ATS match score</div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      {% if top_only %}
+        <a href="{{ url_for('company_applicants', job_id=job.id) }}" class="btn btn-ghost btn-small">Show all</a>
+      {% else %}
+        <a href="{{ url_for('company_applicants', job_id=job.id, top10=1) }}" class="btn btn-amber btn-small">Show top 10</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if items %}
+  <div class="job-list">
+    {% for item in items %}
+    <div class="card" style="display:flex; gap:24px; align-items:center;">
+      <div class="match-gauge" data-score="{{ item.application.ats_score }}" data-size="110" data-caption="Match"></div>
+      <div style="flex:1;">
+        <h3 style="color:var(--ink); margin-bottom:2px;">{{ item.seeker.full_name }}</h3>
+        <div class="job-meta">{{ item.seeker.headline or 'No headline' }} · {{ item.seeker.experience_years }} yrs experience</div>
+
+        {% if item.breakdown.matched_skills %}
+        <div class="job-skills" style="margin-top:10px;">
+          {% for skill in item.breakdown.matched_skills %}<span class="chip match">{{ skill }}</span>{% endfor %}
+          {% for skill in item.breakdown.missing_skills %}<span class="chip miss">{{ skill }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('company_update_status', app_id=item.application.id) }}" style="margin-top:14px; display:flex; gap:8px; align-items:center;">
+          {{ csrf_field() }}
+          <span class="badge badge-{{ item.application.status }}">{{ item.application.status }}</span>
+          <select name="status" style="width:auto; padding:6px 10px;">
+            <option value="applied" {% if item.application.status == 'applied' %}selected{% endif %}>Applied</option>
+            <option value="shortlisted" {% if item.application.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+            <option value="rejected" {% if item.application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+          </select>
+          <button type="submit" class="btn btn-ghost btn-small">Update</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <span class="empty-icon">🎯</span>
+    No applicants yet for this role.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

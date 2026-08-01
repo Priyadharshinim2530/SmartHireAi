@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Company Profile — SmartHireAI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Company Profile</h1>
+      <div class="sub">Set up your brand presence so job seekers know who you are.</div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('company_profile') }}">
+    {{ csrf_field() }}
+    <div class="card form-wide">
+      <label for="company_name">Company name</label>
+      <input type="text" id="company_name" name="company_name" required value="{{ company.company_name }}" placeholder="e.g. Lumen Labs">
+
+      <label for="industry">Industry</label>
+      <input type="text" id="industry" name="industry" value="{{ company.industry or '' }}" placeholder="e.g. Artificial Intelligence, FinTech, HealthTech">
+
+      <label for="website">Website URL</label>
+      <input type="text" id="website" name="website" value="{{ company.website or '' }}" placeholder="e.g. https://lumenlabs.ai">
+
+      <label for="description">About the company</label>
+      <textarea id="description" name="description" rows="6" placeholder="Describe your company's mission, values, work culture, and why developers should join you...">{{ company.description or '' }}</textarea>
+
+      <button type="submit" class="btn btn-amber" style="margin-top:22px;">Save Profile</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

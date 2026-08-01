@@ -1,0 +1,15 @@
+Hello {{ name }},
+
+You have been invited to an interview for "{{ job_title }}" at {{ company_name }}.
+
+Date: {{ date }}
+Time: {{ time }}
+Meeting Link: {{ meeting_link }}
+
+{{ message }}
+
+Please confirm your availability.
+
+Thanks,
+SmartHireAI Team
+
